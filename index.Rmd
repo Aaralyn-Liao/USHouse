@@ -1,6 +1,6 @@
 --- 
-title: "YOUR TITLE HERE"
-author: "YOUR NAMES HERE"
+title: "USHouse"
+author: "Dawei He, Minhui Liao, Nikhil Gopal"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
