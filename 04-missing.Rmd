@@ -1,1 +1,23 @@
 # Missing values
+
+```{r}
+library(tidyverse)
+library(patchwork)
+library(ggplot2)
+library(ggnewscale)
+```
+
+```{r}
+df <- read.table("/Users/Minhui/Desktop/state_market_tracker_update.tsv", sep = "\t", header = TRUE)
+
+house <- df %>% select("period_begin", "period_end", "region_type", "state", "state_code", "property_type", "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "pending_sales", "new_listings", "months_of_supply", "avg_sale_to_list", "sold_above_list", "price_drops", "parent_metro_region")
+```
+
+```{r}
+source("Final_Missing_Pattern_Function.R")
+```
+
+```{r, fig.width=10, fig.height=8}
+plot_missing(house, percent=TRUE)
+```
+
