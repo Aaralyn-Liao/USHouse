@@ -19,6 +19,7 @@ plot_missing <- function(data_name, percent=TRUE){
   # find the middle variable name
   mid_var_idx <- round(length(name_order)/2)
   
+  # data for the main plot
   tidymissing <- data.frame(is.na(data_name)) %>%
     group_by_all() %>%
     count(name = "count", sort = TRUE) %>%
@@ -30,6 +31,7 @@ plot_missing <- function(data_name, percent=TRUE){
     mutate(missing = ifelse(value=="TRUE", "Yes", "No")) %>%
     mutate(key = factor(key, levels = c(name_order)))
   
+  # data for filter the complete cases
   tmp_filter <- data.frame(is.na(data_name)) %>%
     group_by_all() %>%
     count(name = "cnt", sort = TRUE) %>%
@@ -53,6 +55,7 @@ plot_missing <- function(data_name, percent=TRUE){
   
   c_c_fct <- as.factor(c_c)
   
+  # the main plot
   p1 <- ggplot(tidymissing) + 
     geom_tile(aes(x = key, y = fct_rev(id), fill=missing, alpha = id), color = "white") + 
     scale_fill_manual(values=c("Yes"="mediumpurple3", "No"="grey")) +
@@ -61,10 +64,12 @@ plot_missing <- function(data_name, percent=TRUE){
     theme(legend.position="none", panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(), 
           panel.background = element_blank(), 
-          axis.line = element_line(colour = "black")) +
+          axis.line = element_line(colour = "black"),
+          axis.text.x = element_text(angle = 45, hjust = 1)) +
     xlab("variable") +
     ylab("missing pattern")
   
+  # data for the right side plot
   tmp2 <- data.frame(is.na(data_name)) %>%
     group_by_all() %>%
     count(name = "cnt", sort = TRUE) %>%
@@ -96,6 +101,7 @@ plot_missing <- function(data_name, percent=TRUE){
             axis.title.y=element_blank())
   }
   
+  # data for the top plot
   tmp3 <- data.frame(is.na(data_name))
   
   tmp4 <- data.frame(colSums(tmp3)) %>%
@@ -110,14 +116,16 @@ plot_missing <- function(data_name, percent=TRUE){
       geom_col(fill = "cornflowerblue", alpha = 0.6) + theme_bw() +
       ylab("% rows\n missing:") + 
       ylim(0, 100) +
-      theme(panel.grid.major.x=element_blank()) + 
-      theme(axis.title.x=element_blank())
+      theme(axis.title.x=element_blank(),
+            axis.text.x = element_text(angle = 45, hjust = 1),
+            panel.grid.major.x=element_blank())
   }else{
     p3 <- ggplot(tmp4, aes(factor(id), colSums.tmp3.)) +
       geom_col(fill = "cornflowerblue", alpha = 0.6) + theme_bw() +
       ylab("num rows\n missing:") + 
-      theme(panel.grid.major.x=element_blank()) + 
-      theme(axis.title.x=element_blank())
+      theme(axis.title.x=element_blank(),
+            axis.text.x = element_text(angle = 45, hjust = 1),
+            panel.grid.major.x=element_blank())
   }
   
   # blank plot
