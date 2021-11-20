@@ -20,4 +20,16 @@ source("Final_Missing_Pattern_Function.R")
 ```{r, fig.width=10, fig.height=8}
 plot_missing(house, percent=TRUE)
 ```
+```{r, fig.width=10, fig.height=8}
+plot_missing(house, percent=FALSE)
+```
+
+As shown on the plots, more than 75% rows are complete cases. There are 9 variables that have missing values, and the price_drops has the most number of missing data based on the % rows missing bar plot. We do notice that for median_list_price, median_list_ppsf, and new_listings have the same missing pattern. Since new_listings represents the total number of homes with a listing added date during the give time period, median_list_ppsf represents the median price of the most recent listing price, and median_list_ppsf shows the median price of the most recent listing price divided by the total square feet. There are correlations between these three variables, which means missing in one column it is likely to be missing in another column.
+
+
+
+
+
+
+
 
