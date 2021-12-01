@@ -101,61 +101,34 @@
             <section class="normal" id="section-">
 <div id="data-transformation" class="section level1" number="3">
 <h1><span class="header-section-number">Chapter 3</span> Data transformation</h1>
-<pre><code>##    period_begin period_end table_id          state state_code   property_type
-## 1    2021-09-01 2021-09-30       14     New Mexico         NM All Residential
-## 2    2021-09-01 2021-09-30       49      Minnesota         MN All Residential
-## 3    2021-09-01 2021-09-30       18 North Carolina         NC All Residential
-## 4    2021-09-01 2021-09-30       23       Oklahoma         OK All Residential
-## 5    2021-09-01 2021-09-30       25         Hawaii         HI All Residential
-## 6    2021-09-01 2021-09-30        6       Nebraska         NE All Residential
-## 7    2021-09-01 2021-09-30       41          Maine         ME All Residential
-## 8    2021-09-01 2021-09-30       48      Wisconsin         WI All Residential
-## 9    2021-09-01 2021-09-30        1        Alabama         AL All Residential
-## 10   2021-09-01 2021-09-30       40        Vermont         VT All Residential
-##    median_sale_price median_list_price median_ppsf median_list_ppsf homes_sold
-## 1             481900            464600         272              276        335
-## 2             315800            314100         167              168       8553
-## 3             325100            339400         173              177      12047
-## 4             217800            222700         125              128       4755
-## 5             688500            708200         596              621       1704
-## 6             252100            247300         134              135       1859
-## 7             321100            313000         189              199       2285
-## 8             250200            241800         143              143       7983
-## 9             253700            252500         131              130       3534
-## 10            314400            325700         180              190        999
-##    new_listings inventory months_of_supply avg_sale_to_list sold_above_list
-## 1           311       662              2.0        1.0060767      0.04477612
-## 2          8738     11457              1.3        1.0139914      0.52519584
-## 3          9280     16590              1.4        1.0164858      0.53291276
-## 4          4701      6141              1.3        0.9919586      0.39327024
-## 5          1472      3842              2.3        1.0099697      0.44894366
-## 6          1889      1581              0.9        1.0075112      0.47229693
-## 7           990      2254              1.0        1.0068724      0.46958425
-## 8          7828     17462              2.2        1.0086368      0.50344482
-## 9          2772      5367              1.5        1.0012200      0.41086587
-## 10          706      2441              2.4        1.0052246      0.44344344
-##    off_market_in_two_weeks parent_metro_region lubridate::ymd(period_begin)
-## 1                0.3410835         West Region                   2021-09-01
-## 2                0.4652562      Midwest Region                   2021-09-01
-## 3                0.3138482        South Region                   2021-09-01
-## 4                0.6075671        South Region                   2021-09-01
-## 5                0.1388962         West Region                   2021-09-01
-## 6                0.7038419      Midwest Region                   2021-09-01
-## 7                0.4888416    Northeast Region                   2021-09-01
-## 8                0.1459791      Midwest Region                   2021-09-01
-## 9                0.2249156        South Region                   2021-09-01
-## 10               0.2290816    Northeast Region                   2021-09-01
-##    lubridate::ymd(period_end)
-## 1                  2021-09-30
-## 2                  2021-09-30
-## 3                  2021-09-30
-## 4                  2021-09-30
-## 5                  2021-09-30
-## 6                  2021-09-30
-## 7                  2021-09-30
-## 8                  2021-09-30
-## 9                  2021-09-30
-## 10                 2021-09-30</code></pre>
+<pre><code>##   period_begin period_end table_id          state state_code   property_type
+## 1   2021-09-01 2021-09-30       14     New Mexico         NM All Residential
+## 2   2021-09-01 2021-09-30       49      Minnesota         MN All Residential
+## 3   2021-09-01 2021-09-30       18 North Carolina         NC All Residential
+## 4   2021-09-01 2021-09-30       23       Oklahoma         OK All Residential
+## 5   2021-09-01 2021-09-30       25         Hawaii         HI All Residential
+## 6   2021-09-01 2021-09-30        6       Nebraska         NE All Residential
+##   median_sale_price median_list_price median_ppsf median_list_ppsf homes_sold
+## 1            481900            464600         272              276        335
+## 2            315800            314100         167              168       8553
+## 3            325100            339400         173              177      12047
+## 4            217800            222700         125              128       4755
+## 5            688500            708200         596              621       1704
+## 6            252100            247300         134              135       1859
+##   new_listings inventory months_of_supply avg_sale_to_list sold_above_list
+## 1          311       662              2.0        1.0060767      0.04477612
+## 2         8738     11457              1.3        1.0139914      0.52519584
+## 3         9280     16590              1.4        1.0164858      0.53291276
+## 4         4701      6141              1.3        0.9919586      0.39327024
+## 5         1472      3842              2.3        1.0099697      0.44894366
+## 6         1889      1581              0.9        1.0075112      0.47229693
+##   off_market_in_two_weeks parent_metro_region
+## 1               0.3410835         West Region
+## 2               0.4652562      Midwest Region
+## 3               0.3138482        South Region
+## 4               0.6075671        South Region
+## 5               0.1388962         West Region
+## 6               0.7038419      Midwest Region</code></pre>
 <p>We selected required variables, filtered property type as “All Residential”, converted date to <em>Date</em> class ,and filtered the range of dates.</p>
 
 </div>
