@@ -1,1 +1,28 @@
 # Data transformation
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- read.table("/Users/Minhui/Desktop/state_market_tracker_update.tsv", sep = "\t", header = TRUE)
+
+house <- df %>% select("period_begin", "period_end", "table_id", "state", "state_code", "property_type", "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "new_listings", "inventory", "months_of_supply", "avg_sale_to_list", "sold_above_list", "off_market_in_two_weeks", "parent_metro_region")%>%
+  mutate(period_begin, lubridate::ymd(period_begin))%>%
+  mutate(period_end, lubridate::ymd(period_end))%>%
+  filter(property_type=="All Residential",
+         period_begin>=as.Date("2018-01-01"),
+         period_end>=as.Date("2018-01-31"))%>%
+  arrange(desc(period_begin))
+
+house$period_begin <- lubridate::ymd(house$period_begin)
+house$period_end <- lubridate::ymd(house$period_end)  
+```
+
+```{r}
+head(house,10)
+```
+
+We selected required variables, filtered property type as "All Residential", converted date to *Date* class ,and filtered the range of dates.
+
+
