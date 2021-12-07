@@ -81,8 +81,14 @@ tmp <- tmp %>% group_by(state, year) %>%
 
 tmp <- na.omit(tmp)
 
-tmp <- rbind (head(tmp, 5),tail(tmp, 5))
+tmp <- rbind (head(tmp, 3),tail(tmp, 3))
 
+
+
+#improvements: 
+#add color, add counts on top/side of the bar
+#order the data
+#separate appreciation/depreciation into one plot
 ggplot(tmp, aes(x = mean_yoy_price_change, y = state)) +
   geom_bar(stat = "identity") + xlab("Mean Yearly Price Change") + 
   ggtitle("States with the Highest Annual % Housing Price Change")
@@ -93,6 +99,7 @@ ggplot(tmp, aes(x = state, y = mean_yoy_price_change)) +
 
   
 # Time series of time vs percentage sold above asking price for metro areas (9)
+# Facet Wrap
 metros <- subset(data, parent_metro_region == "Los Angeles, CA" | 
               parent_metro_region == "New York, NY" |
               parent_metro_region == "Houston, TX" |
@@ -102,5 +109,6 @@ metros <- subset(data, parent_metro_region == "Los Angeles, CA" |
 
 ggplot(metros, aes(x = period_begin, y = sold_above_list, 
                  group = parent_metro_region, color = parent_metro_region)) +
-  geom_line()
+  geom_line() + 
+  ggtitle("% Sold Above List Price Over Time") 
 
