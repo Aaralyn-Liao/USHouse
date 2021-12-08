@@ -4,7 +4,7 @@ library(zipcodeR)
 library(choroplethrZip)
 library(stringr)
 library(lubridate)
-
+library(RColorBrewer)
 
 #read in new data with zip code data
 full_data <- read.table("zip_code_market_tracker.tsv000", header = TRUE, sep = "\t")
@@ -58,12 +58,13 @@ data <- sample_n(df_zc, 1000)
 data$period_begin <- as.Date(data$period_begin)
 data$urban <- data$urban$Urban
 data$urban <- as.factor(data$urban)
-
+data <- filter(data, data$urban != "NA")
 
 #Inventory vs Time for Rural vs Urban Areas (#8)
 ggplot(data, aes(x = period_begin, y = median_sale_price, group = urban, color = urban)) +
   geom_line() + 
-  ggtitle("Inventory vs Time for Rural vs Urban Areas") + xlab("Date") + ylab("Median Sale Price")
+  ggtitle("Inventory vs Time for Rural vs Urban Areas") + xlab("Date") + ylab("Median Sale Price") + 
+  facet_wrap(~urban, nrow = 3)
 
 #Plot of yearly states with the most yearly price change (#7)
 tmp <- data
@@ -84,14 +85,29 @@ tmp <- na.omit(tmp)
 tmp <- rbind (head(tmp, 3),tail(tmp, 3))
 
 
-
 #improvements: 
 #add color, add counts on top/side of the bar
 #order the data
 #separate appreciation/depreciation into one plot
-ggplot(tmp, aes(x = mean_yoy_price_change, y = state)) +
+
+data1$x <- factor(data1$x,                                    # Change ordering manually
+                  levels = c("B", "D", "E", "C", "A"))
+
+tmp$state <- factor(tmp$state,
+                    levels = c("Delaware", "Maine", "Maryland", "Kansas", "Arizona", "Idaho"))
+
+ggplot(tmp, aes(x = mean_yoy_price_change, 
+                       y = state, fill = state)) +
   geom_bar(stat = "identity") + xlab("Mean Yearly Price Change") + 
-  ggtitle("States with the Highest Annual % Housing Price Change")
+  ggtitle("States with the Highest Annual % Housing Price Change") +
+  geom_text(aes(label = round(mean_yoy_price_change, digits = 1)), vjust = 0) 
+
+ggplot(tmp, aes(x = mean_yoy_price_change, 
+                y = state, color = state)) +
+  geom_bar(stat = "identity") + xlab("Mean Yearly Price Change") + 
+  ggtitle("States with the Highest Annual % Housing Price Change") +
+  geom_text(aes(label = round(mean_yoy_price_change, digits = 1)), vjust = 0) 
+
 
 ggplot(tmp, aes(x = state, y = mean_yoy_price_change)) +
   geom_bar(stat = "identity") + ylab("Mean Yearly Price Change") + 
@@ -111,4 +127,5 @@ ggplot(metros, aes(x = period_begin, y = sold_above_list,
                  group = parent_metro_region, color = parent_metro_region)) +
   geom_line() + 
   ggtitle("% Sold Above List Price Over Time") 
+
 
