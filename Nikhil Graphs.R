@@ -5,6 +5,8 @@ library(choroplethrZip)
 library(stringr)
 library(lubridate)
 library(RColorBrewer)
+library(usmap)
+library(ggstatsplot)
 
 #read in new data with zip code data
 full_data <- read.table("zip_code_market_tracker.tsv000", header = TRUE, sep = "\t")
@@ -127,5 +129,42 @@ ggplot(metros, aes(x = period_begin, y = sold_above_list,
                  group = parent_metro_region, color = parent_metro_region)) +
   geom_line() + 
   ggtitle("% Sold Above List Price Over Time") 
+
+
+
+
+#2020 Census State Population Data
+#https://www.census.gov/data/tables/2020/dec/2020-apportionment-data.html
+#link to data:
+#https://www2.census.gov/programs-surveys/decennial/2020/data/apportionment/apportionment-2020-table01.xlsx
+
+#2010-2019 Census State Population Data:
+#https://www.census.gov/data/tables/time-series/demo/popest/2010s-state-total.html#par_textimage_1574439295
+#link to data:
+#https://www2.census.gov/programs-surveys/popest/tables/2010-2019/state/totals/nst-est2019-01.xlsx
+
+
+#differences were calculated in excel
+
+state_pop <- read.csv("Yearly State Population.csv", header = TRUE)
+flows <- state_pop[13:22]
+flows$state <- state_pop$state
+
+flows_till_19 <- flows[1:10]
+flows$avg_yearly_migration_till_19 <- rowMeans(flows_till_19)
+
+Covid_migration_flows <- state_pop %>% 
+  summarise(state, 
+            Change = X2020.00 - X2019.00)
+
+
+
+
+plot_usmap(data = Covid_migration_flows, values = "Change", color = "red") + 
+  scale_fill_continuous(
+    low = "white", high = "black", name = "Difference", label = scales::comma
+  ) + 
+  theme(legend.position = "right") + 
+  ggtitle("Change in Yearly State Migration in 2020 vs Average of 2010-2019")
 
 
