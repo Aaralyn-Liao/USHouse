@@ -3,5 +3,8 @@ data-sources
 data-transformation
 missing-values
 results
+plot-1-cleveland-plot
+plot-2-geofacet-plot
+plot-3-parallel-coordinate-plot
 interactive-component
 conclusion

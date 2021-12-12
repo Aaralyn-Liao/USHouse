@@ -1,3 +1,155 @@
 # Results
 
-test
+```{r}
+library(tidyverse)
+library(stringr)
+library(ggplot2)
+library(geofacet)
+library(parcoords)
+library(d3r)
+library(geofacet)
+```
+
+```{r}
+df <- read.table("USHouse_States.tsv", sep = "\t", header = TRUE)
+
+house <- df %>% select("period_begin", "period_end", "table_id", "state", "state_code", "property_type", "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "new_listings", "inventory", "months_of_supply", "avg_sale_to_list", "sold_above_list", "off_market_in_two_weeks", "parent_metro_region")%>%
+  mutate(period_begin=lubridate::ymd(period_begin))%>%
+  mutate(period_end=lubridate::ymd(period_end))%>%
+  filter(property_type=="All Residential",
+         period_begin>=as.Date("2018-01-01"),
+         period_end>=as.Date("2018-01-31"))%>%
+  arrange(desc(period_begin))
+```
+
+## Plot 1 Cleveland Plot
+
+```{r}
+# Plot 1 data filter
+
+p1_df <- house%>%
+  mutate(year=case_when(str_detect(period_begin, "2021") ~ "2021",
+                        str_detect(period_begin, "2020") ~ "2020",
+                        str_detect(period_begin, "2019") ~ "2019",
+                        str_detect(period_begin, "2018") ~ "2018"))%>%
+  select(year, state, new_listings)
+
+years_want <- c("2019","2020")
+
+p1_data <- p1_df%>%
+  filter(year %in% years_want)%>%
+  group_by(state, year)%>%
+  summarise(sum_new_listings=sum(new_listings))%>%
+  ungroup()
+
+p1_data_try <- p1_data%>%spread(year, sum_new_listings)%>%
+  arrange(desc(`2019`))%>%
+  group_by(state)%>%
+  mutate(diff=(`2020`- `2019`)/`2019`,
+         max= max(`2020`,`2019`),
+         min= min(`2020`,`2019`))%>%
+  filter(abs(diff)>0.05)
+
+right_label <- p1_data %>%
+        group_by(state) %>%
+        arrange(desc(sum_new_listings))%>%
+        top_n(1)
+
+right_label <- filter(right_label, state %in% p1_data_try$state)
+
+p1_data_try1 <- p1_data_try%>%
+  select(state, sum_new_listings=max, diff)%>%
+  right_join(right_label)
+
+highlight <- filter(p1_data, state %in% p1_data_try$state)
+```
+
+```{r, fig.height=8, fig.width=8}
+p1 <- ggplot(p1_data, aes(x=sum_new_listings, y=fct_reorder2(state, year=="2019", sum_new_listings, .desc=FALSE), color=year))+
+  geom_line(aes(group=state), col="black", alpha=0.4)+
+  geom_point(aes(color=year), alpha=0.4)+
+  geom_line(data = highlight, aes(group = state), col="black") +
+  geom_point(data = highlight, aes(color = year), size = 2) +
+  geom_text(data = p1_data_try1, aes(color = year, label = scales::percent(round(diff, 3))),
+                  size = 4, hjust = -.5)+
+  scale_x_continuous(labels = scales::comma, limits = c(-50, 500500))+
+  labs(x="Number of New Listing Houses", y="States", 
+       title = "Cleveland Plot of 2019 VS 2020 Number of New Listing Houses")+
+  theme_linedraw()
+p1
+```
+
+
+## Plot 2 Geofacet Plot
+
+```{r}
+# Plot 2 data filter
+p2_df <- house%>%
+  mutate(year=case_when(str_detect(period_begin, "2021") ~ "2021",
+                        str_detect(period_begin, "2020") ~ "2020",
+                        str_detect(period_begin, "2019") ~ "2019",
+                        str_detect(period_begin, "2018") ~ "2018"))%>%
+  select(period_begin, year, state, homes_sold)
+
+p2_data <- p2_df%>%
+  filter(year %in% years_want)%>%
+  group_by(state, year)%>%
+  summarise(sum_homes_sold=sum(homes_sold))%>%
+  ungroup()
+```
+
+
+```{r, fig.height=8, fig.width=15}
+p2_1 <- ggplot(p2_data, aes(year, sum_homes_sold, fill = year)) +
+  geom_col(alpha=0.3) +
+ # geom_col(data=p2_data, aes(fill = year))+
+  coord_flip() +
+  theme_bw() +
+  facet_geo(~ state, grid = "us_state_grid2")
+```
+
+```{r}
+p2_df <- house%>%
+  mutate(year=case_when(str_detect(period_begin, "2021") ~ "2021",
+                        str_detect(period_begin, "2020") ~ "2020",
+                        str_detect(period_begin, "2019") ~ "2019",
+                        str_detect(period_begin, "2018") ~ "2018"))%>%
+  select(period_begin, year, state, homes_sold)
+
+```
+
+
+```{r, fig.height=8, fig.width=15}
+p2_2 <- ggplot(p2_df, mapping=aes(y=homes_sold, x=period_begin)) +
+  geom_line(color = "steelblue", size=1.5)+
+  theme_bw() +
+  facet_geo(~ state, grid = "us_state_grid2")+
+  labs(x="Date", y="Number of Homes Sold", 
+       title = "Time series trend line of number of homes sold for each state")
+p2_2
+```
+
+## Plot 3 Parallel Coordinate Plot
+
+```{r}
+p3_df <- house%>%
+  select(period_begin, state, median_sale_price, parent_metro_region)%>%
+  arrange(period_begin)
+p3_try <- p3_df %>%
+  pivot_wider(names_from = period_begin, values_from = median_sale_price)
+```
+
+
+```{r, fig.width=10, fig.height=8}
+parcoords(p3_try[, c(1, 5, 11, 17, 23, 29, 35, 41, 47, 2)],
+          rownames = F,
+          brushMode = "1D-axes",
+          reorderable = T,
+          queue = T,
+          color = list(colorBy="parent_metro_region"),
+          withD3 = TRUE, 
+          autoresize = F)
+```
+
+
+
