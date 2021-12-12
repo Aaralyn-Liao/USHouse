@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>USHouse Vertical Bar Chart</title>
+    <script src="https://d3js.org/d3.v7.js"></script>
+  </head>
+
+  <body>
+    <h1>USHouse Vertical Bar Chart</h1>
+    <svg></svg>
+    <p></p>
+    <button type="button" class="btn btn-primary" onclick="add()">Add bar</button>
+    <button type="button" class="btn btn-danger" onclick="remove()">Remove bar</button>
+
+  <script>
+
+// Create svg and initial bars
+
+  var w = 500;
+  var h = 400;
+  var margin = {top: 45, right: 0, bottom: 25, left: 25};
+  var innerWidth = w - margin.left - margin.right;
+  var innerHeight = h - margin.top - margin.bottom;
+
+  var svg = d3.select("svg")
+      .attr("width", w)
+      .attr("height", h);
+
+  svg.append("rect")
+      .attr("x", 0)
+      .attr("y", 20)
+      .attr("width", w)
+      .attr("height", h)
+      .attr("fill", "lightblue");
+
+  var bardata = [{key: "HI", value: 601},
+                {key: "DC", value: 529},
+                {key: "CA", value: 472},
+                {key: "NY", value: 414},
+                {key: "MA", value: 345},
+                {key: "WA", value: 329},
+                {key: "OR", value: 274},
+                {key: "NM", value: 271},
+                {key: "ID", value: 262},
+                {key: "NJ", value: 255},
+                {key: "AZ", value: 233},
+                {key: "UT", value: 233},
+                {key: "NV", value: 232},
+                {key: "CO", value: 217},
+                {key: "VA", value: 216},
+                {key: "RI", value: 214},
+                {key: "FL", value: 212},
+                {key: "NH", value: 211},
+                {key: "ME", value: 196},
+                {key: "MD", value: 194},
+                {key: "AK", value: 191},
+                {key: "CT", value: 186},
+                {key: "VT", value: 185},
+                {key: "TN", value: 178},
+                {key: "IA", value: 175},
+                {key: "NC", value: 173},
+                {key: "SC", value: 170},
+                {key: "IL", value: 169},
+                {key: "MN", value: 167},
+                {key: "TX", value: 166},
+                {key: "PA", value: 163},
+                {key: "GA", value: 158},
+                {key: "DE", value: 156},
+                {key: "LA", value: 151},
+                {key: "MI", value: 151},
+                {key: "KS", value: 148},
+                {key: "WI", value: 144},
+                {key: "WV", value: 141},
+                {key: "KY", value: 135},
+                {key: "NE", value: 134},
+                {key: "MO", value: 132},
+                {key: "AL", value: 131},
+                {key: "OH", value: 130},
+                {key: "AR", value: 128},
+                {key: "OK", value: 125},
+                {key: "MS", value: 124},
+                {key: "IN", value: 124}];
+
+// Just show 6 states data at the beginning
+
+  let initialData = bardata.slice(0, 6)
+
+  var xScale = d3.scaleBand()
+      .domain(initialData.map(d => d.key))
+      .range([0, innerWidth])
+      .paddingInner(.1);
+
+  var yScale = d3.scaleLinear()
+      .domain([0, d3.max(initialData.map(d=>d.value))])
+      .range([innerHeight, 0])
+
+  var xAxis = d3.axisBottom()
+      .scale(xScale);
+
+  var yAxis = d3.axisLeft()
+      .scale(yScale);
+
+  var bars = svg.append("g")
+      .attr("id", "plot")
+      .attr("transform", `translate (${margin.left}, ${margin.top})`)
+    .selectAll("rect")
+      .data(initialData, d=>d.key);
+      
+  var accent = d3.scaleOrdinal(d3.schemeTableau10);
+  
+  bars.enter().append("rect")
+      .attr("class","bar")
+      .attr("x", d => xScale(d.key))
+      .attr("y", d => yScale(d.value))
+      .attr("width", xScale.bandwidth())
+      .attr("height", d => innerHeight - yScale(d.value))
+      .attr("fill", accent);
+
+  svg.append("g")
+      .attr("class", "xAxis")
+      .attr("transform", `translate (${margin.left}, ${h - margin.bottom})`)
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "yAxis")
+      .attr("transform", `translate (${margin.left}, ${margin.top})`)
+      .call(yAxis);
+
+// General Update Pattern
+
+  function update(data) {
+    const values = data.map(a => a.value);
+    const keys = data.map(a => a.key);
+
+    xScale.domain(keys);
+
+    yScale.domain([0, d3.max(values)]);
+
+    var bars = svg.select("#plot")
+        .selectAll("rect")
+        .data(data);
+
+    bars.enter().append("rect")
+      //.attr("x", d => xScale(d.key))
+      .attr("x", w*1.1)
+      .attr("y", d => yScale(d.value)) 
+      .attr("width", xScale.bandwidth())
+      .attr("height", d => innerHeight - yScale(d.value))
+      .attr("fill", "hotpink")
+      .merge(bars)
+      .transition()
+      .duration(1200)
+      .ease(d3.easeLinear)
+      .attr("x", d => xScale(d.key))
+      .attr("y", d => yScale(d.value))
+      .attr("width", xScale.bandwidth())
+      .attr("height", d => innerHeight - yScale(d.value))
+      .transition()
+      .duration(1200)
+      .ease(d3.easeLinear)
+      .attr("fill", accent);
+
+    bars.exit()
+      .transition()
+      .duration(1200)
+      .ease(d3.easeLinear)
+      .attr("x", w*1.1)
+      .remove();
+
+    svg.select(".xAxis")
+      .transition()
+      .duration(1200)
+      .ease(d3.easeLinear)
+      .call(xAxis);
+
+    svg.select(".yAxis")
+      .transition()
+      .duration(1200)
+      .ease(d3.easeLinear)
+      .call(yAxis);
+
+  }
+
+
+    function add() {
+      if (initialData.length < bardata.length) {
+        var newvalue = bardata[initialData.length];
+        initialData.push(newvalue);
+        update(initialData);
+      }
+    }
+
+    function remove() {
+      initialData.pop();
+      update(initialData);
+      };
+
+
+    </script>
+
+  </body>
+
+</html>

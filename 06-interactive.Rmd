@@ -1,3 +1,6 @@
 # Interactive component
 
+Please click "Add bar" or "Remove bar". The interactive bar chart will show you the sorted *Median sale price per square foot* of 47 states in the US from 2021-09-01 to 2021-09-30.
 
+
+<iframe src="USHouseBarChart.html" width="600" height="500"></iframe>
