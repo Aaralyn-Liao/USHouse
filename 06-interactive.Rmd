@@ -1,4 +1,4 @@
 # Interactive component
 
 
-<iframe src="USHouseBarChart.html" width="1000" height="700"></iframe>
+<iframe src="USHouseBarChart.html" width="600" height="500"></iframe>
