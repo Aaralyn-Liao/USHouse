@@ -33,6 +33,114 @@ house <- df %>% select("period_begin", "period_end", "table_id", "state", "state
   arrange(desc(period_begin))
 ```
 
+
+## Geofacet Plot
+
+```{r}
+# Plot 2 data filter
+p2_df <- house%>%
+  mutate(year=case_when(str_detect(period_begin, "2021") ~ "2021",
+                        str_detect(period_begin, "2020") ~ "2020",
+                        str_detect(period_begin, "2019") ~ "2019",
+                        str_detect(period_begin, "2018") ~ "2018"))%>%
+  select(period_begin, year, state, homes_sold)
+
+```
+
+Time Series of Number of Homes Sold by State
+
+```{r, fig.height=10, fig.width=16}
+p2_2 <- ggplot(p2_df, mapping=aes(y=homes_sold, x=period_begin)) +
+  geom_line(color = "steelblue", size=1.5)+
+  geom_smooth(method = lm, se = FALSE, size = 0.5, fullrange=TRUE, alpha=0.5)+
+  facet_geo(~ state, grid = "us_state_grid2")+
+  labs(x="Date", y="Number of Homes Sold")+
+  theme_bw(10)
+p2_2
+```
+
+
+This Geofacet plot shows the number of homes sold over time by state. The time range is from January, 2018 to October, 2021. This graph is useful for identifying seasonal trends in number of homes sold, which could be a proxy for the demand for US housing. Additionally, we observed sharp changes in certain states during the pandemic, while the pandemic appeared to have a negligible effect on other states. For example, California, Texas and Florida surprisingly saw an increase in homes sold, while states like Nebraska or Delaware had relatively less change.
+
+
+## Bar Plot
+
+```{r}
+p3_data <- house%>%
+  filter(as.numeric(format(period_begin, "%Y")) == 2020 | as.numeric(format(period_begin, "%Y")) == 2019) %>%
+  mutate(year = format(period_begin, "%Y")) %>%
+  group_by(parent_metro_region, year) %>%
+  summarize(sum_sold = sum(homes_sold)) %>%
+  rename(region = parent_metro_region)
+```
+
+```{r}
+p3 <- ggplot(p3_data, aes(x=year, y=sum_sold, fill = year)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_grid(~region)+
+  geom_text(aes(label = sum_sold), vjust = -0.4)+
+  labs(y="Number of Homes Sold", x="Year", title = "Number of Homes Sold by Region 2020 vs 2019")
+p3
+```
+
+This bar graph shows that the number of homes sold increased in every region from 2019 to 2020. This is surprising when considering the increase in housing prices and the impact of the pandemic. The southern region has the highest number of homes sold and the highest increase, likely because more states in the dataset are considered “southern” compared to other regions. Additionally, because many Americans chose to move to those states in 2020.
+
+
+## Mosaic Plot 
+
+```{r}
+house16 <- df %>% select("period_begin", "period_end", "table_id", "state", "state_code", "property_type", "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "new_listings", "inventory", "months_of_supply", "avg_sale_to_list", "sold_above_list", "off_market_in_two_weeks", "parent_metro_region")%>%
+  mutate(period_begin=lubridate::ymd(period_begin))%>%
+  mutate(period_end=lubridate::ymd(period_end))%>%
+  filter(period_begin>=as.Date("2018-01-01"),
+         period_end>=as.Date("2018-01-31"))%>%
+  arrange(desc(period_begin))
+
+
+tmp16 <- house16 %>%
+  mutate(Year = format(period_begin, "%Y")) %>%
+  group_by(Year, property_type, parent_metro_region) %>%
+  summarize(inventory = mean(inventory, na.rm=T)) %>%
+  filter(property_type != "All Residential") %>%
+  mutate(inventory = round(inventory)) %>%
+  mutate(property_type = factor(property_type, levels = c("Multi-Family (2-4 Unit)", "Townhouse", "Condo/Co-op", "Single Family Residential")))%>%
+  rename(Type = property_type, Region = parent_metro_region)
+
+tmp16 <- as.data.frame(lapply(tmp16, rep, tmp16$inventory))
+levels(tmp16$Type) <- c("MultiFamily", "Townhouse", "Condo","Family")
+
+```
+
+
+```{r, fig.width=10, fig.height=8}
+mosaic(Type ~ Region + Year,tmp16, direction = c("v","v", "h"), 
+       highlighting_fill = brewer.pal(4,"Purples"),
+       rot_labels = c(0,0,0,0), main="Type of Home Sold by Region 2018-2021")
+```
+
+
+This mosaic plot shows the types of houses sold overtime (2018-2021) in different regions of the United States. The bars show the proportion of homes sold that correspond to each type (multi-family, townhouse, condo/co-op, single family residential). We noticed that over time, the number of single-family homes sold dropped in each region, while the number of condo and multi-family homes sold started to increase. We also noticed that this effect was comparatively more pronounced in the Midwest and the Northwest compared to the South and the West, although those regions still followed the general trend.
+
+
+## Overlapping Density Plots
+
+```{r}
+house2 <- house
+house2$Region <- house2$parent_metro_region
+
+house2$Region = factor(house2$Region, levels = c("Midwest Region","South Region","Northeast Region","West Region"))
+
+ggplot(house2, aes(x = median_sale_price, fill = Region, color = Region)) +
+  geom_density(alpha = 0.5) + xlab("Median Sale Price") + ylab("Density") +
+  scale_y_continuous(labels = scales::percent) + 
+  scale_x_continuous(labels = scales::dollar) + 
+  ggtitle("Median Sale Price By Region")
+```
+
+
+This overlapping density plot shows the distribution of median sale price by US region. We noticed that the Midwest region’s spread was lower than the other regions, and that it had the cheapest house prices on average centered around $200,000. The South region was also has high proportion of the data with cheaper house prices, and its distribution is slightly more spread out than the Midwest. The Northeast and the West are bimodal, and homes in those regions on average cost more. This is likely because more homes in these two regions are in urban areas compared to the Midwest and the South.
+
+
 ## Cleveland Plot
 
 ```{r}
@@ -75,7 +183,8 @@ p1_data_try1 <- p1_data_try%>%
 highlight <- filter(p1_data, state %in% p1_data_try$state)
 ```
 
-```{r, fig.height=8, fig.width=8}
+
+```{r, fig.height=7, fig.width=7}
 p1 <- ggplot(p1_data, aes(x=sum_new_listings, y=fct_reorder2(state, year=="2019", sum_new_listings, .desc=FALSE), color=year))+
   geom_line(aes(group=state), col="black", alpha=0.5)+
   geom_point(aes(color=year), alpha=0.5)+
@@ -84,65 +193,19 @@ p1 <- ggplot(p1_data, aes(x=sum_new_listings, y=fct_reorder2(state, year=="2019"
   geom_text(data = p1_data_try1, aes(color = year, label = scales::percent(round(diff, 3))),
                   size = 4, hjust = -.5)+
   scale_x_continuous(labels = scales::comma, limits = c(-50, 500500))+
-  labs(x="Number of New Listing Houses", y="States", 
-       title = "Cleveland Plot of 2019 VS 2020 Number of New Listing Houses")+
-  theme_linedraw()
+  labs(x="Number of New Homes Listed", y="State", 
+       title = "Cleveland Plot of 2019 VS 2020 Number of New Homes Listed")+
+  theme_linedraw()+
+  theme_grey(base_size = 11)
 p1
 ```
 
-This plot shows the percentage change in the number of houses listed between 2019 and 2020 for each state, the data were sorted by the number of homes listed in 2019. The highlighted states are states with an annual absolute difference greater than 5%. The state with the biggest decrease was Hawaii, with an annual decrease of 11.6%. Washington, DC had the largest annual increase in homes sold (7.5%). One possible explanation for the states with strong decreases in the number of new houses listed is the pandemic. States like NY, PA and HI became much less appealing to move to during COVID-19, and thus less homes would be listed in these areas.
 
-## Geofacet Plot
-
-```{r}
-# Plot 2 data filter
-p2_df <- house%>%
-  mutate(year=case_when(str_detect(period_begin, "2021") ~ "2021",
-                        str_detect(period_begin, "2020") ~ "2020",
-                        str_detect(period_begin, "2019") ~ "2019",
-                        str_detect(period_begin, "2018") ~ "2018"))%>%
-  select(period_begin, year, state, homes_sold)
-
-```
-
-
-```{r, fig.height=10, fig.width=16}
-p2_2 <- ggplot(p2_df, mapping=aes(y=homes_sold, x=period_begin)) +
-  geom_line(color = "steelblue", size=1.5)+
-  geom_smooth(method = lm, se = FALSE, size = 0.5, fullrange=TRUE, alpha=0.5)+
-  theme_bw() +
-  facet_geo(~ state, grid = "us_state_grid2")+
-  labs(x="Date", y="Number of Homes Sold", 
-       title = "Time series trend line of number of homes sold for each state")
-p2_2
-```
-
-This Geofacet plot shows the number of homes sold over time by state. The time range is from January, 2018 to October, 2021. This graph is useful for identifying seasonal trends in number of homes sold, which could be a proxy for the demand for US housing. Additionally, we observed sharp changes in certain states during the pandemic, while the pandemic appeared to have a negligible effect on other states. For example, California, Texas and Florida surprisingly saw an increase in homes sold, while states like Nebraska or Delaware had relatively less change.
-
-## Bar Plot
-
-```{r}
-p3_data <- house%>%
-  filter(as.numeric(format(period_begin, "%Y")) == 2020 | as.numeric(format(period_begin, "%Y")) == 2019) %>%
-  mutate(year = format(period_begin, "%Y")) %>%
-  group_by(parent_metro_region, year) %>%
-  summarize(sum_sold = sum(homes_sold)) %>%
-  rename(region = parent_metro_region)
-```
-
-```{r}
-p3 <- ggplot(p3_data, aes(x=year, y=sum_sold, fill = year)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_grid(~region)+
-  geom_text(aes(label = sum_sold), vjust = -0.4)+
-  labs(y="Number of houses sold", title = "Comparison of number of homes sold of four regions in 2019 VS 2020")
-p3
-```
-
+This plot shows the percentage change in the number of new houses listed between 2019 and 2020 for each state, the data were sorted by the number of homes listed in 2019. The highlighted states are states with an annual absolute difference greater than 5%. The state with the biggest decrease was Hawaii, with an annual decrease of 11.6%. Washington, DC had the largest annual increase in homes listed (7.5%). One possible explanation for the states with strong decreases in the number of new houses listed is the pandemic. States like NY, PA and HI became much less appealing to move to during COVID-19, and thus less homes would be listed in these areas.
 
 ## Time Series Plot (with mouse over information) 
 
-```{r, fig.width=10, fig.height=6}
+```{r, fig.width=8, fig.height=6}
 
 tmp12 = house %>% group_by(state_code) %>%
   summarize(mean_supply = mean(months_of_supply)) %>%
@@ -161,7 +224,7 @@ df12 = house %>% group_by(period_begin,state_code) %>%
 p12 = ggplot(df12, aes(x=time, y=mean_supply)) +
   geom_line(aes(color=state_code)) +
   xlab("") + ylab("Months of Supply") +
-  ggtitle("Time series plots of Months of Supply and \noff-market in two weeks for each state", )+
+  ggtitle("Months of Supply and Percent Off Market in Two Weeks by State")+
   theme(axis.title=element_text(size=10))
 
 p12 = ggplotly(p12)
@@ -182,7 +245,7 @@ df13 = house %>% group_by(period_begin,state_code) %>%
 
 p13 = ggplot(df13, aes(x=time, y=mean_offmarket)) +
   geom_line(aes(color=state_code)) +
-  xlab("Time") + ylab("Off-market in two weeks")
+  xlab("Time") + ylab("Off-market in Two Weeks")
 
 p13 = ggplotly(p13)
 
@@ -218,111 +281,64 @@ p14 = plot_usmap(data = house14, values = "diff20", labels = T)+
   labs(title = "Difference in Average PPSF by State 2019 vs 2020")+
   theme(legend.position = "right")
 
-#p14 = ggplotly(p14)
 p14
 ```
 
 This graph is a heatmap of the difference in price per square foot between 2019 and 2020. Most states had a slight increase in average price per square foot sold, while states like California and Washington had noticeably large increases. Contrary to the general trend, in New York the average price per square foot decreased, meaning that relatively cheaper homes started to be sold. The states colored in gray are ones where no data was obtained. 
 This trend of a general increase in housing prices is possibly caused by the high levels of inflation in the US economy during 2020, and the pandemic.
 
+
 ## Box Plots
 
-```{r, fig.width=8, fig.height=12}
+```{r, fig.width=6, fig.height=8}
 tmp1 = house %>%
   filter(as.numeric(format(period_begin, "%Y")) == 2020) %>%
   filter(period_begin < "2020-07-01") %>%
   arrange(desc(period_begin), state_code) %>%
-  select(period_begin, state, off_market_in_two_weeks)
+  select(period_begin, state_code, off_market_in_two_weeks)
 
 tmp2 = house %>%
   filter(as.numeric(format(period_begin, "%Y")) == 2019) %>%
   filter(period_begin < "2019-07-01") %>%
   arrange(desc(period_begin), state_code) %>%
-  select(period_begin, state, off_market_in_two_weeks)
+  select(period_begin, state_code, off_market_in_two_weeks)
 
 tmp1 = tmp1 %>%
   rename(off_market_in_two_weeks_2020 = off_market_in_two_weeks) %>%
   mutate(off_market_in_two_weeks_2019 = tmp2$off_market_in_two_weeks) %>%
   mutate(diff = off_market_in_two_weeks_2020 -off_market_in_two_weeks_2019)
 
-ggplot(tmp1 , aes(diff, reorder(state, diff, median)))+
+ggplot(tmp1 , aes(diff, reorder(state_code, diff, median)))+
   geom_boxplot()+
-  theme_grey(base_size = 25) +
-  geom_vline(xintercept = 0, color="red",size=1.2)+
-  labs(x="Difference of proportion of off-market", y="States", 
-       title = "Boxplot of Difference of proportion of off-market \nbetween 2019 & 2020 for each state")
+  theme_grey(base_size = 10) +
+  geom_vline(xintercept = 0, color="red",size=1, alpha=0.8)+
+  labs(x="Difference in Proportion Off-Market in Two Weeks 2020-2019", y="States", 
+       title = "Difference in Proportion Off-Market in Two Weeks by State 2020 vs 2019")
 ```
+
 
 This boxplot shows the difference in the proportion of listed homes that are off the market in two weeks between 2019 and 2020. The red line represents a difference of 0, meaning no difference between years. This graph shows us that most states had an increase in the proportion, meaning that more homes in 2020 were sold within two weeks than in 2019. 
 
 Box plots are also useful because they give more information on the spread of the data, and can show outliers. Some states like Alaska have very big ranges, and one should factor this in when choosing to sell a home in a given state. On the other hand, Kentucky had the highest median difference in proportion (approximately 0.15), and a very small inter-quartile range. Massachusetts had a difference in proportion of -0.25, the smallest in the dataset.
 
 
-## Mosaic Plot 
-
-```{r}
-house16 <- df %>% select("period_begin", "period_end", "table_id", "state", "state_code", "property_type", "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "new_listings", "inventory", "months_of_supply", "avg_sale_to_list", "sold_above_list", "off_market_in_two_weeks", "parent_metro_region")%>%
-  mutate(period_begin=lubridate::ymd(period_begin))%>%
-  mutate(period_end=lubridate::ymd(period_end))%>%
-  filter(period_begin>=as.Date("2018-01-01"),
-         period_end>=as.Date("2018-01-31"))%>%
-  arrange(desc(period_begin))
-
-
-tmp16 <- house16 %>%
-  mutate(Year = format(period_begin, "%Y")) %>%
-  group_by(Year, property_type, parent_metro_region) %>%
-  summarize(inventory = mean(inventory, na.rm=T)) %>%
-  filter(property_type != "All Residential") %>%
-  mutate(inventory = round(inventory)) %>%
-  mutate(property_type = factor(property_type, levels = c("Multi-Family (2-4 Unit)", "Townhouse", "Condo/Co-op", "Single Family Residential")))%>%
-  rename(Type = property_type, Region = parent_metro_region)
-
-#levels(tmp16$property_type) <- c("Multi-Family", "Townhouse", "Condo","Family")
-  
-
-tmp16 <- as.data.frame(lapply(tmp16, rep, tmp16$inventory))
-
-```
-
-
-```{r, fig.width=15, fig.height=12}
-mosaic(Type ~ Region + Year,tmp16, direction = c("v","v", "h"), 
-       highlighting_fill = brewer.pal(4,"Purples"),
-       rot_labels = c(0,0,0,0))
-```
-This mosaic plot shows the types of houses sold overtime (2018-2021) in different regions of the United States. The bars show the proportion of homes sold that correspond to each type (multi-family, townhouse, condo/co-op, single family residential). We noticed that over time, the number of single-family homes sold dropped in each region, while the number of condo and multi-family homes sold started to increase. We also noticed that this effect was comparatively more pronounced in the Midwest and the Northwest compared to the South and the West, although those regions still followed the general trend.
-
-## Overlapping density plots
-
-```{r}
-house2 <- house
-house2$Region <- house2$parent_metro_region
-
-
-ggplot(house2, aes(x = median_list_price, fill = Region, color = Region)) +
-  geom_density(alpha = 0.5) + xlab("Median List Price") + ylab("Density") +
-  scale_y_continuous(labels = scales::percent) + 
-  scale_x_continuous(labels = scales::dollar) + 
-  ggtitle("Median List Price By Region")
-```
-
-
-## Filled density plot
+## Filled Density Plot
 
 ```{r}
 ggplot(house2, aes(x = off_market_in_two_weeks, y = avg_sale_to_list)) +
   geom_point() + geom_density_2d_filled(alpha = 0.7) +
   geom_density_2d(size = 0.25, color = "black") + 
   xlab("Percent Off Market in Two Weeks") + ylab("Average Ratio of Sale to List Price") +
-  ggtitle("Filled Density Plot of Sale to List Price vs Percent Off Market in Two Weeks") +
+  ggtitle("Sale to List Price vs Percent Off Market in Two Weeks") +
   scale_x_continuous(labels = scales::percent)
 
 ```
 
 
+This filled density plot compares the average list price and the percentage of homes that are off the market within two weeks. The contour bands help the viewer to pinpoint where the majority of the data lie, and are useful for visualizing this very spread out distribution. From this graph, we observe that homes that have a ratio of 0.97 of sale price to list price on average tend to sell slower than homes with higher ratios of sale prices to list prices. This is likely because buyers who can bid above the asking price are able to convince the owner to sell very quickly and promptly close the deal.
 
-## Scatter plots
+
+## Scatter Plots
 
 ```{r, fig.width=6, fig.height=6}
 #scatter plots
@@ -343,8 +359,9 @@ states %>%
   ggplot(aes(x = median_sale_price, y = homes_sold)) +
   geom_point() + facet_wrap(~state, ncol = 1) + geom_smooth(aes(color = state), method = lm) + 
   xlab("Median Sale Price") + scale_x_continuous(labels = scales::dollar) + 
-  ggtitle("Median Sale Price vs Number of Homes Sold by State") + ylab("Homes Sold") +
+  ggtitle("Number of Homes Sold by State vs Median Sale Price ") + ylab("Homes Sold") +
   theme(legend.position = "none")
 
 ```
 
+These scatter plots show the number of homes sold vs median sale price for the five states with the highest proportion of citizens living in urban areas. The states were sorted by slope of best fit line, from least to greatest. Interestingly, all of the states had a positive relationship between the number of homes sold and the median sale price, meaning that as homes become more expensive, the more homes are sold. California had the highest slope among those states, as well as the highest median sale price.

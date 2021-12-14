@@ -3,14 +3,14 @@ data-sources
 data-transformation
 missing-values
 results
-cleveland-plot
 geofacet-plot
 bar-plot
+mosaic-plot
+overlapping-density-plots
+cleveland-plot
 time-series-plot-with-mouse-over-information
 map-plot
 box-plots
-mosaic-plot
-overlapping-density-plots
 filled-density-plot
 scatter-plots
 interactive-component
