@@ -120,37 +120,35 @@
             <section class="normal" id="section-">
 <div id="data-transformation" class="section level1" number="3">
 <h1><span class="header-section-number">Chapter 3</span> Data transformation</h1>
-<p>Describe the process of getting the data into a form in which you could work with it in R. If your code does not lend itself to being including in the .Rmd file, provide a link to the folder or file(s) that contain(s) that code.</p>
-<p>(suggested: approximately 1/2 page)</p>
+<p>The process of importing the data into R was extremely smooth. We downloaded the data from Redfin, extracted it and then read it directly into an R data frame. Afterwards, we changed a few variables to factor and date classes. We then used the dplyr select function to choose only the columns and time range (2018-01-01 to 2021-10-31) we wanted to focus on. Here are the first 6 rows of the dataset.</p>
 <pre><code>##   period_begin period_end table_id          state state_code   property_type
-## 1   2021-09-01 2021-09-30       14     New Mexico         NM All Residential
-## 2   2021-09-01 2021-09-30       49      Minnesota         MN All Residential
-## 3   2021-09-01 2021-09-30       18 North Carolina         NC All Residential
-## 4   2021-09-01 2021-09-30       23       Oklahoma         OK All Residential
-## 5   2021-09-01 2021-09-30       25         Hawaii         HI All Residential
-## 6   2021-09-01 2021-09-30        6       Nebraska         NE All Residential
+## 1   2021-10-01 2021-10-31       18 North Carolina         NC All Residential
+## 2   2021-10-01 2021-10-31       17       Columbia         DC All Residential
+## 3   2021-10-01 2021-10-31       46  West Virginia         WV All Residential
+## 4   2021-10-01 2021-10-31       12     New Jersey         NJ All Residential
+## 5   2021-10-01 2021-10-31       21        Georgia         GA All Residential
+## 6   2021-10-01 2021-10-31       39      Louisiana         LA All Residential
 ##   median_sale_price median_list_price median_ppsf median_list_ppsf homes_sold
-## 1            481900            464600         272              276        335
-## 2            315800            314100         167              168       8553
-## 3            325100            339400         173              177      12047
-## 4            217800            222700         125              128       4755
-## 5            688500            708200         596              621       1704
-## 6            252100            247300         134              135       1859
+## 1            327800            340000         174              180      11101
+## 2            706000            660000         529              528        840
+## 3            282400            274300         152              151        496
+## 4            409900            417100         251              255      11670
+## 5            328200            330900         160              165      13306
+## 6            257700            279300         153              160       2312
 ##   new_listings inventory months_of_supply avg_sale_to_list sold_above_list
-## 1          311       662              2.0        1.0060767      0.04477612
-## 2         8738     11457              1.3        1.0139914      0.52519584
-## 3         9280     16590              1.4        1.0164858      0.53291276
-## 4         4701      6141              1.3        0.9919586      0.39327024
-## 5         1472      3842              2.3        1.0099697      0.44894366
-## 6         1889      1581              0.9        1.0075112      0.47229693
+## 1         9768     17638              1.6        1.0132368       0.5203135
+## 2         1000      2362              2.8        1.0034682       0.3666667
+## 3          518       842              1.7        0.9947753       0.3447581
+## 4        11197     26931              2.3        1.0110519       0.5131962
+## 5        13305     17973              1.4        1.0010887       0.4439351
+## 6         2057      3595              1.6        0.9841027       0.2564879
 ##   off_market_in_two_weeks parent_metro_region
-## 1               0.3410835         West Region
-## 2               0.4652562      Midwest Region
-## 3               0.3138482        South Region
-## 4               0.6075671        South Region
-## 5               0.1388962         West Region
-## 6               0.7038419      Midwest Region</code></pre>
-<p>We selected required variables, filtered property type as “All Residential”, converted date to <em>Date</em> class ,and filtered the range of dates.</p>
+## 1               0.3020888        South Region
+## 2               0.3279045        South Region
+## 3               0.3634018        South Region
+## 4               0.2899781    Northeast Region
+## 5               0.5239125        South Region
+## 6               0.5555043        South Region</code></pre>
 
 </div>
             </section>
