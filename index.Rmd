@@ -1,9 +1,18 @@
 --- 
 title: "USHouse"
-author: "Dawei He, Minhui Liao, Nikhil Gopal"
+author: "Dawei He [dh3027], Minhui Liao [ml4517], Nikhil Gopal [nsg2127]"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 ---
 
 # Introduction
+
+Owning a home is considered a cornerstone of the American dream, and for many Americans is the first step towards building wealth. This piqued our curiosity in working with data from the American housing market, as we wanted to further understand what could drive housing prices. Additionally, the COVID-19 pandemic has brought many changes to our lives, and we hypothesized that there were likely changes induced by the pandemic on the housing market. For example, stay at home orders could influence the number of homes purchased and listed and import restrictions could limit the raw materials needed to build new homes. 
+
+In this project, we will explore housing market data from the popular real estate broker, Redfin, and attempt to answer the following questions:
+
+*	Is it getting more expensive for Americans to buy homes?
+*	Where are house prices rising and falling in the United States?
+*	What other interesting factors could drive prices in the American housing market?
+*	How has COVID-19 accelerated or reversed trends in the housing market?
 

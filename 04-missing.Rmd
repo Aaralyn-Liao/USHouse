@@ -9,9 +9,9 @@ library(ggnewscale)
 
 
 ```{r}
-df <- read.table("/Users/Minhui/Desktop/state_market_tracker_update.tsv", sep = "\t", header = TRUE)
+df_missing <- read.table("USHouse_States.tsv", sep = "\t", header = TRUE)
 
-house <- df %>% select("period_begin", "period_end", "region_type", "state", "state_code", "property_type", "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "pending_sales", "new_listings", "months_of_supply", "avg_sale_to_list", "sold_above_list", "price_drops", "parent_metro_region")
+house_missing <- df_missing %>% select("period_begin", "period_end", "region_type", "state", "state_code", "property_type", "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "pending_sales", "new_listings", "months_of_supply", "avg_sale_to_list", "sold_above_list", "price_drops", "parent_metro_region")
 ```
 
 ```{r}
@@ -19,22 +19,23 @@ source("Final_Missing_Pattern_Function.R")
 ```
 
 ```{r, fig.width=10, fig.height=8}
-plot_missing(house, percent=TRUE)
-```
-```{r, fig.width=10, fig.height=8}
-plot_missing(house, percent=FALSE)
+plot_missing(house_missing, percent=TRUE)
 ```
 
-As shown on the plots, more than 75% of rows are complete cases. There are 9 variables that have missing values, and the price_drops has the most missing data based on the % rows missing bar plot. We do notice that median_list_price, median_list_ppsf, and new_listings have the same missing pattern. Since new_listings represents the total number of homes with a listing added date during the given time period, median_list_ppsf represents the median price of the most recent listing price, and median_list_ppsf shows the median price of the most recent listing price divided by the total square feet. There are correlations between these three variables, which means missing in one column is likely to be missing in another column. We may use the median or mean value of that variable to fill up those missing data, or we could build a model to predict the value for future data visualization.
+```{r, fig.width=10, fig.height=8}
+plot_missing(house_missing, percent=FALSE)
+```
+
+As shown on the plots, more than 75% of rows are complete cases. There are 9 variables that have missing values, and the price_drops has the most missing data based on the % rows missing bar plot. We do notice that median_list_price, median_list_ppsf, and new_listings have the same missing pattern. Since new_listings represents the total number of homes with a listing added date during the given time period, median_list_ppsf represents the median price of the most recent listing price, and median_list_ppsf shows the median price of the most recent listing price divided by the total square feet. There are correlations between these three variables, which means missing in one column is likely to be missing in another column. We may use the median or mean value of that variable to fill up those missing data, or we could build a model to predict the value for future data visualization. By column discussion, the following columns had zero missing values: period_begin, period_end, region_type, state, state_code_ property_type, median_sale_price, homes_sold, parent_metro_region. Sold_above_list, months_of_supply, pending_sales, new_listings, median_list_ppsf, median_ppsf and avg_sale_to_list, all had less than 5% of their values missing, meaning that it is fine to proceed with normal analysis of these variables. Finally, price_drops had a substantial amount of missing data (around 20%). However, this variable ended up not being used in our analysis.
 
 ```{r, fig.width=10, fig.height=8}
-df <- house
+df_temp <- house_missing
 
-df$na_count <- apply(is.na(df), 1, sum)
+df_temp$na_count <- apply(is.na(df_temp), 1, sum)
 
-na_by_state <- df %>%
+na_by_state <- df_temp %>%
   group_by(state) %>%
-  summarise(count = sum(na_count))%>%
+  summarize(count = sum(na_count))%>%
   arrange(desc(count))
 
 ggplot(data=na_by_state, aes(x=count, y=reorder(state, count))) +
@@ -42,7 +43,7 @@ ggplot(data=na_by_state, aes(x=count, y=reorder(state, count))) +
   labs(title = "Number of Missing Values by State", y="states")
 ```
 
-As shown on the plots, we found Kansas has most of the counts of missing values among all states in the dataset.
+As shown on the plots, we found Kansas has most of the counts of missing values among all states in the dataset. There are 14 states have no missing value.
 
 
 

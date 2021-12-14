@@ -21,10 +21,10 @@
   
   
 
-<meta name="author" content="Dawei He, Minhui Liao, Nikhil Gopal" />
+<meta name="author" content="Dawei He [dh3027], Minhui Liao [ml4517], Nikhil Gopal [nsg2127]" />
 
 
-<meta name="date" content="2021-12-12" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -54,9 +54,12 @@
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-<link href="libs/parallel-coordinates-2.1.8/parcoords.css" rel="stylesheet" />
-<script src="libs/parcoords-binding-1.0.0/parcoords.js"></script>
-<script src="libs/d3-5.16.0/d3.min.js"></script>
+<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 
@@ -83,9 +86,16 @@
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
 <li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#plot-1-cleveland-plot"><i class="fa fa-check"></i><b>5.1</b> Plot 1 Cleveland Plot</a></li>
-<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#plot-2-geofacet-plot"><i class="fa fa-check"></i><b>5.2</b> Plot 2 Geofacet Plot</a></li>
-<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#plot-3-parallel-coordinate-plot"><i class="fa fa-check"></i><b>5.3</b> Plot 3 Parallel Coordinate Plot</a></li>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#geofacet-plot"><i class="fa fa-check"></i><b>5.1</b> Geofacet Plot</a></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#bar-plot"><i class="fa fa-check"></i><b>5.2</b> Bar Plot</a></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#mosaic-plot"><i class="fa fa-check"></i><b>5.3</b> Mosaic Plot</a></li>
+<li class="chapter" data-level="5.4" data-path="results.html"><a href="results.html#overlapping-density-plots"><i class="fa fa-check"></i><b>5.4</b> Overlapping Density Plots</a></li>
+<li class="chapter" data-level="5.5" data-path="results.html"><a href="results.html#cleveland-plot"><i class="fa fa-check"></i><b>5.5</b> Cleveland Plot</a></li>
+<li class="chapter" data-level="5.6" data-path="results.html"><a href="results.html#time-series-plot-with-mouse-over-information"><i class="fa fa-check"></i><b>5.6</b> Time Series Plot (with mouse over information)</a></li>
+<li class="chapter" data-level="5.7" data-path="results.html"><a href="results.html#map-plot"><i class="fa fa-check"></i><b>5.7</b> Map Plot</a></li>
+<li class="chapter" data-level="5.8" data-path="results.html"><a href="results.html#box-plots"><i class="fa fa-check"></i><b>5.8</b> Box Plots</a></li>
+<li class="chapter" data-level="5.9" data-path="results.html"><a href="results.html#filled-density-plot"><i class="fa fa-check"></i><b>5.9</b> Filled Density Plot</a></li>
+<li class="chapter" data-level="5.10" data-path="results.html"><a href="results.html#scatter-plots"><i class="fa fa-check"></i><b>5.10</b> Scatter Plots</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
@@ -110,6 +120,18 @@
             <section class="normal" id="section-">
 <div id="data-sources" class="section level1" number="2">
 <h1><span class="header-section-number">Chapter 2</span> Data sources</h1>
+<p>Redfin is an online real estate brokerage that allows users to list their own homes and be matched with real estate agent to sell or purchase a home. Redfin collects data on all the homes sold and listed on their platform and makes this data available to the public. Many of the variables included contain common information on the real estate transactions on Redfin (listing price, square footage, sale price, location, time on market, etc.).</p>
+<p>This data is obviously not perfectly representative of the entire housing market, as not all American homes are bought or sold using Redfin. However, Redfin has extremely high market penetration in all but a few of the states, and provided us with a large amount of samples of homes in all kinds of categories (urban vs suburban, large vs small, expensive vs cheap). Crucially, since Redfin is online, they were also able to continue collecting data throughout the pandemic. Thus, we decided that this dataset would be a representative enough sample of the American housing market.</p>
+<p>Redfin gives users the option to download data that is grouped by state, metro area, city, zip code or even neighborhood. Since we did not need the extra functionality of more precise location data for our analysis, we decided to choose the state data. The only problems that we noticed with the dataset was that for a few variables the following states did not have data collected: Montana, North Dakota, South Dakota, Wyoming.</p>
+<p>Types of Variables:</p>
+<ul>
+<li><p>Categorical variables: “state”, “state_code”, “property_type”, “parent_metro_region”</p></li>
+<li><p>Quantitative variables: “median_sale_price”, “median_list_price”, “median_ppsf”, “median_list_ppsf”, “homes_sold”, “new_listings”, “inventory”, “months_of_supply”, “avg_sale_to_list”, “sold_above_list”, “off_market_in_two_weeks”</p></li>
+</ul>
+<p>Number of Records: 26624 rows</p>
+<p>To find a download link to the dataset, please visit the Redfin Data Center:
+<a href="https://www.redfin.com/news/data-center/" class="uri">https://www.redfin.com/news/data-center/</a></p>
+<p>For more information on the contents of each variable, please refer to the codebook: <a href="https://www.redfin.com/news/data-center-metrics-definitions/" class="uri">https://www.redfin.com/news/data-center-metrics-definitions/</a></p>
 
 </div>
             </section>

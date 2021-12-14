@@ -21,10 +21,10 @@
   
   
 
-<meta name="author" content="Dawei He, Minhui Liao, Nikhil Gopal" />
+<meta name="author" content="Dawei He [dh3027], Minhui Liao [ml4517], Nikhil Gopal [nsg2127]" />
 
 
-<meta name="date" content="2021-12-12" />
+<meta name="date" content="2021-12-13" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -54,9 +54,12 @@
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
 <script src="libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-<link href="libs/parallel-coordinates-2.1.8/parcoords.css" rel="stylesheet" />
-<script src="libs/parcoords-binding-1.0.0/parcoords.js"></script>
-<script src="libs/d3-5.16.0/d3.min.js"></script>
+<script src="libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
 
 
 
@@ -83,9 +86,16 @@
 <li class="chapter" data-level="4" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4</b> Missing values</a></li>
 <li class="chapter" data-level="5" data-path="results.html"><a href="results.html"><i class="fa fa-check"></i><b>5</b> Results</a>
 <ul>
-<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#plot-1-cleveland-plot"><i class="fa fa-check"></i><b>5.1</b> Plot 1 Cleveland Plot</a></li>
-<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#plot-2-geofacet-plot"><i class="fa fa-check"></i><b>5.2</b> Plot 2 Geofacet Plot</a></li>
-<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#plot-3-parallel-coordinate-plot"><i class="fa fa-check"></i><b>5.3</b> Plot 3 Parallel Coordinate Plot</a></li>
+<li class="chapter" data-level="5.1" data-path="results.html"><a href="results.html#geofacet-plot"><i class="fa fa-check"></i><b>5.1</b> Geofacet Plot</a></li>
+<li class="chapter" data-level="5.2" data-path="results.html"><a href="results.html#bar-plot"><i class="fa fa-check"></i><b>5.2</b> Bar Plot</a></li>
+<li class="chapter" data-level="5.3" data-path="results.html"><a href="results.html#mosaic-plot"><i class="fa fa-check"></i><b>5.3</b> Mosaic Plot</a></li>
+<li class="chapter" data-level="5.4" data-path="results.html"><a href="results.html#overlapping-density-plots"><i class="fa fa-check"></i><b>5.4</b> Overlapping Density Plots</a></li>
+<li class="chapter" data-level="5.5" data-path="results.html"><a href="results.html#cleveland-plot"><i class="fa fa-check"></i><b>5.5</b> Cleveland Plot</a></li>
+<li class="chapter" data-level="5.6" data-path="results.html"><a href="results.html#time-series-plot-with-mouse-over-information"><i class="fa fa-check"></i><b>5.6</b> Time Series Plot (with mouse over information)</a></li>
+<li class="chapter" data-level="5.7" data-path="results.html"><a href="results.html#map-plot"><i class="fa fa-check"></i><b>5.7</b> Map Plot</a></li>
+<li class="chapter" data-level="5.8" data-path="results.html"><a href="results.html#box-plots"><i class="fa fa-check"></i><b>5.8</b> Box Plots</a></li>
+<li class="chapter" data-level="5.9" data-path="results.html"><a href="results.html#filled-density-plot"><i class="fa fa-check"></i><b>5.9</b> Filled Density Plot</a></li>
+<li class="chapter" data-level="5.10" data-path="results.html"><a href="results.html#scatter-plots"><i class="fa fa-check"></i><b>5.10</b> Scatter Plots</a></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="interactive-component.html"><a href="interactive-component.html"><i class="fa fa-check"></i><b>6</b> Interactive component</a></li>
 <li class="chapter" data-level="7" data-path="conclusion.html"><a href="conclusion.html"><i class="fa fa-check"></i><b>7</b> Conclusion</a></li>
@@ -110,35 +120,35 @@
             <section class="normal" id="section-">
 <div id="data-transformation" class="section level1" number="3">
 <h1><span class="header-section-number">Chapter 3</span> Data transformation</h1>
+<p>The process of importing the data into R was extremely smooth. We downloaded the data from Redfin, extracted it and then read it directly into an R data frame. Afterwards, we changed a few variables to factor and date classes. We then used the dplyr select function to choose only the columns and time range (2018-01-01 to 2021-10-31) we wanted to focus on. Here are the first 6 rows of the dataset.</p>
 <pre><code>##   period_begin period_end table_id          state state_code   property_type
-## 1   2021-09-01 2021-09-30       14     New Mexico         NM All Residential
-## 2   2021-09-01 2021-09-30       49      Minnesota         MN All Residential
-## 3   2021-09-01 2021-09-30       18 North Carolina         NC All Residential
-## 4   2021-09-01 2021-09-30       23       Oklahoma         OK All Residential
-## 5   2021-09-01 2021-09-30       25         Hawaii         HI All Residential
-## 6   2021-09-01 2021-09-30        6       Nebraska         NE All Residential
+## 1   2021-10-01 2021-10-31       18 North Carolina         NC All Residential
+## 2   2021-10-01 2021-10-31       17       Columbia         DC All Residential
+## 3   2021-10-01 2021-10-31       46  West Virginia         WV All Residential
+## 4   2021-10-01 2021-10-31       12     New Jersey         NJ All Residential
+## 5   2021-10-01 2021-10-31       21        Georgia         GA All Residential
+## 6   2021-10-01 2021-10-31       39      Louisiana         LA All Residential
 ##   median_sale_price median_list_price median_ppsf median_list_ppsf homes_sold
-## 1            481900            464600         272              276        335
-## 2            315800            314100         167              168       8553
-## 3            325100            339400         173              177      12047
-## 4            217800            222700         125              128       4755
-## 5            688500            708200         596              621       1704
-## 6            252100            247300         134              135       1859
+## 1            327800            340000         174              180      11101
+## 2            706000            660000         529              528        840
+## 3            282400            274300         152              151        496
+## 4            409900            417100         251              255      11670
+## 5            328200            330900         160              165      13306
+## 6            257700            279300         153              160       2312
 ##   new_listings inventory months_of_supply avg_sale_to_list sold_above_list
-## 1          311       662              2.0        1.0060767      0.04477612
-## 2         8738     11457              1.3        1.0139914      0.52519584
-## 3         9280     16590              1.4        1.0164858      0.53291276
-## 4         4701      6141              1.3        0.9919586      0.39327024
-## 5         1472      3842              2.3        1.0099697      0.44894366
-## 6         1889      1581              0.9        1.0075112      0.47229693
+## 1         9768     17638              1.6        1.0132368       0.5203135
+## 2         1000      2362              2.8        1.0034682       0.3666667
+## 3          518       842              1.7        0.9947753       0.3447581
+## 4        11197     26931              2.3        1.0110519       0.5131962
+## 5        13305     17973              1.4        1.0010887       0.4439351
+## 6         2057      3595              1.6        0.9841027       0.2564879
 ##   off_market_in_two_weeks parent_metro_region
-## 1               0.3410835         West Region
-## 2               0.4652562      Midwest Region
-## 3               0.3138482        South Region
-## 4               0.6075671        South Region
-## 5               0.1388962         West Region
-## 6               0.7038419      Midwest Region</code></pre>
-<p>We selected required variables, filtered property type as “All Residential”, converted date to <em>Date</em> class ,and filtered the range of dates.</p>
+## 1               0.3020888        South Region
+## 2               0.3279045        South Region
+## 3               0.3634018        South Region
+## 4               0.2899781    Northeast Region
+## 5               0.5239125        South Region
+## 6               0.5555043        South Region</code></pre>
 
 </div>
             </section>
