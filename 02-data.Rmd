@@ -1,1 +1,22 @@
 # Data sources
+
+Redfin is an online real estate brokerage that allows users to list their own homes and be matched with real estate agent to sell or purchase a home. Redfin collects data on all the homes sold and listed on their platform and makes this data available to the public. Many of the variables included contain common information on the real estate transactions on Redfin (listing price, square footage, sale price, location, time on market, etc.).
+
+This data is obviously not perfectly representative of the entire housing market, as not all American homes are bought or sold using Redfin. However, Redfin has extremely high market penetration in all but a few of the states, and provided us with a large amount of samples of homes in all kinds of categories (urban vs suburban, large vs small, expensive vs cheap). Crucially, since Redfin is online, they were also able to continue collecting data throughout the pandemic. Thus, we decided that this dataset would be a representative enough sample of the American housing market.
+
+Redfin gives users the option to download data that is grouped by state, metro area, city, zip code or even neighborhood. Since we did not need the extra functionality of more precise location data for our analysis, we decided to choose the state data. The only problems that we noticed with the dataset was that for a few variables the following states did not have data collected: Montana, North Dakota, South Dakota, Wyoming.
+
+
+Types of Variables:
+
+* Categorical variables: "state", "state_code", "property_type", "parent_metro_region"
+
+* Quantitative variables: "median_sale_price", "median_list_price", "median_ppsf", "median_list_ppsf", "homes_sold", "new_listings", "inventory", "months_of_supply", "avg_sale_to_list", "sold_above_list", "off_market_in_two_weeks"
+
+Number of Records: 26624 rows
+
+To find a download link to the dataset, please visit the Redfin Data Center:
+https://www.redfin.com/news/data-center/
+
+For more information on the contents of each variable, please refer to the codebook: https://www.redfin.com/news/data-center-metrics-definitions/
+
