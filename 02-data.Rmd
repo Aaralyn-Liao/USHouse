@@ -1,1 +1,9 @@
 # Data sources
+
+Describe the data sources: who is responsible for collecting the data? How is it collected? If there were a choice of options, explain how you chose.
+
+Provide some basic information about the dataset: types of variables, number of records, etc.
+
+Describe any issues / problems with the data, either known or that you discover.
+
+(suggested: approximately 1 page)

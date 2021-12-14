@@ -1,5 +1,9 @@
 # Data transformation
 
+Describe the process of getting the data into a form in which you could work with it in R. If your code does not lend itself to being including in the .Rmd  file, provide a link to the folder or file(s) that contain(s) that code.
+
+(suggested: approximately 1/2 page)
+
 ```{r}
 library(tidyverse)
 ```
